@@ -1,27 +1,24 @@
 /* Name: main.c
- * Author: <insert your name here>
- * Copyright: <insert your copyright message here>
- * License: <insert your license reference here>
+ * Author: Sebastian Lindberg
  */
 
 #include <avr/io.h>
-#include <util/delay.h>
 #include <avr/interrupt.h>
+
 #include "uart.h"
 
+
 #define LED_INIT()		DDRB  |= (1 << 5);
-#define LED_ON() 		PORTB |= (1 << 5);
+#define LED_ON() 			PORTB |= (1 << 5);
 #define LED_OFF() 		PORTB &=~(1 << 5);
 #define LED_TOGGLE()	PORTB ^= (1 << 5);
 
 
-ISR (TIMER0_OVF_vect)
-{
-	// Enter ADC conversion mode
-}
+ISR_EMPTY (TIMER0_OVF_vect);
 
 ISR (ADC_vect)
 {		
+	LED_TOGGLE();
 	printf("%u, ", ADCW);
 }
 
@@ -29,7 +26,7 @@ int main(void)
 {
 	LED_INIT();
 	
-	// ADC
+	// Setup ADC
 	ADMUX	=
 		// AVCC with external capacitor at AREF pin
 		(0 << REFS1) | (1 << REFS0) |
@@ -50,10 +47,14 @@ int main(void)
 	TIMSK1	=	(1 << TOIE1);
 
 	serial_init();
-
-    while (1) 
-    {
 	
-    }
-    return 0;
+	// Enable global interrupts
+	sei();
+
+  for (;;) 
+  {
+		// Do nothing
+  }
+  
+  return 0;
 }
